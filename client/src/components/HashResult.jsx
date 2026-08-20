@@ -1,5 +1,19 @@
 import { useState } from 'react';
-import { ShieldCheck, Copy, Check, RotateCcw, FileText, Clock, Hash, Blocks, Building, Share2 } from 'lucide-react';
+import {
+  ShieldCheck,
+  Copy,
+  Check,
+  RotateCcw,
+  FileText,
+  Clock,
+  Hash,
+  Blocks,
+  Building,
+  Share2,
+  Download,
+  Loader2,
+} from 'lucide-react';
+import { generateCertificatePDF } from '../lib/certificateGenerator.js';
 
 function formatBytes(bytes) {
   if (!bytes || bytes === 0) return '0 B';
@@ -12,6 +26,7 @@ function formatBytes(bytes) {
 export default function HashResult({ data, onReset }) {
   const [copiedHash, setCopiedHash] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const doc = data.document;
 
   const copyHash = async () => {
@@ -21,10 +36,21 @@ export default function HashResult({ data, onReset }) {
   };
 
   const copyVerificationLink = async () => {
-    const url = `${window.location.origin}/verify`;
+    const url = `${window.location.origin}/verify?hash=${doc.originalHash}`;
     await navigator.clipboard.writeText(url);
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2000);
+  };
+
+  const handleDownloadCertificate = async () => {
+    setDownloading(true);
+    try {
+      await generateCertificatePDF(doc);
+    } catch (err) {
+      console.error('Failed to generate certificate:', err);
+    } finally {
+      setDownloading(false);
+    }
   };
 
   return (
@@ -128,13 +154,25 @@ export default function HashResult({ data, onReset }) {
       </div>
 
       {/* Action Buttons */}
-      <div className="mt-6 flex gap-3">
+      <div className="mt-6 flex flex-col sm:flex-row gap-3">
+        <button
+          onClick={handleDownloadCertificate}
+          disabled={downloading}
+          className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl text-xs shadow-md transition-all disabled:opacity-50"
+        >
+          {downloading ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Download className="w-4 h-4" />
+          )}
+          <span>Download Verification Certificate (PDF)</span>
+        </button>
         <button
           onClick={onReset}
-          className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-medium text-sm transition-all border border-slate-700"
+          className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-medium text-xs transition-all border border-slate-700"
         >
           <RotateCcw className="w-4 h-4" />
-          Anchor Another Document
+          Anchor Another
         </button>
       </div>
     </div>

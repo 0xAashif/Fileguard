@@ -1,15 +1,55 @@
-import { useState, useRef, useCallback } from 'react';
-import { ShieldCheck, ShieldAlert, Search, UploadCloud, Loader2, FileText, Building, Hash, Calendar, CheckCircle2 } from 'lucide-react';
+import { useState, useRef, useCallback, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import {
+  ShieldCheck,
+  ShieldAlert,
+  Search,
+  UploadCloud,
+  Loader2,
+  FileText,
+  Building,
+  Hash,
+  Download,
+  Share2,
+  Check,
+} from 'lucide-react';
 import { verifyByFile, verifyByHash } from '../lib/api.js';
+import { generateCertificatePDF } from '../lib/certificateGenerator.js';
 
 export default function VerifySection() {
+  const [searchParams] = useSearchParams();
   const [tab, setTab] = useState('file'); // 'file' | 'hash'
   const [state, setState] = useState('idle'); // idle | loading | result
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
   const [hashInput, setHashInput] = useState('');
   const [dragActive, setDragActive] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
   const inputRef = useRef(null);
+
+  // Auto-verify if hash parameter is present in URL query
+  useEffect(() => {
+    const hashParam = searchParams.get('hash');
+    if (hashParam && /^[a-f0-9]{64}$/i.test(hashParam.trim())) {
+      setHashInput(hashParam.trim());
+      setTab('hash');
+      executeHashVerification(hashParam.trim());
+    }
+  }, [searchParams]);
+
+  const executeHashVerification = async (hashToVerify) => {
+    setState('loading');
+    setError('');
+    try {
+      const data = await verifyByHash(hashToVerify.toLowerCase());
+      setResult(data);
+      setState('result');
+    } catch (err) {
+      setError(err.response?.data?.error || err.response?.data?.message || err.message);
+      setState('idle');
+    }
+  };
 
   // ── Verify by File ──
   const handleFileVerify = useCallback(async (file) => {
@@ -33,16 +73,27 @@ export default function VerifySection() {
       setError('Invalid hash. Must be a 64-character SHA-256 hexadecimal string.');
       return;
     }
-    setState('loading');
-    setError('');
+    executeHashVerification(cleaned);
+  };
+
+  const handleDownloadCertificate = async () => {
+    if (!result?.document) return;
+    setDownloading(true);
     try {
-      const data = await verifyByHash(cleaned);
-      setResult(data);
-      setState('result');
+      await generateCertificatePDF(result.document);
     } catch (err) {
-      setError(err.response?.data?.error || err.response?.data?.message || err.message);
-      setState('idle');
+      console.error('Failed to generate PDF certificate:', err);
+    } finally {
+      setDownloading(false);
     }
+  };
+
+  const handleCopyShareLink = async () => {
+    if (!result?.document?.originalHash) return;
+    const url = `${window.location.origin}/verify?hash=${result.document.originalHash}`;
+    await navigator.clipboard.writeText(url);
+    setCopiedLink(true);
+    setTimeout(() => setCopiedLink(false), 2000);
   };
 
   const reset = () => {
@@ -99,7 +150,7 @@ export default function VerifySection() {
               <div className="flex items-center justify-between">
                 <span className="text-slate-400">Cryptographic Hash</span>
                 <span className="font-mono text-slate-300">
-                  {doc.originalHash.slice(0, 10)}...{doc.originalHash.slice(-10)}
+                  {doc.originalHash.slice(0, 12)}...{doc.originalHash.slice(-12)}
                 </span>
               </div>
 
@@ -116,18 +167,44 @@ export default function VerifySection() {
               </div>
 
               <div className="flex items-center justify-between pt-2 border-t border-slate-800 text-slate-400">
-                <span>Verification Count</span>
-                <span>{doc.verificationCount} audit checks</span>
+                <span>Audit Verifications</span>
+                <span>{doc.verificationCount} total checks</span>
               </div>
             </div>
           )}
 
-          <button
-            onClick={reset}
-            className="mt-6 px-6 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-200 hover:text-white hover:border-slate-600 transition-all text-xs font-semibold"
-          >
-            Verify Another Document
-          </button>
+          {/* Action Buttons */}
+          <div className="mt-6 flex flex-col sm:flex-row gap-3">
+            {isAuthentic && (
+              <>
+                <button
+                  onClick={handleDownloadCertificate}
+                  disabled={downloading}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl text-xs shadow-md transition-all disabled:opacity-50"
+                >
+                  {downloading ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Download className="w-4 h-4" />
+                  )}
+                  <span>Download PDF Certificate</span>
+                </button>
+                <button
+                  onClick={handleCopyShareLink}
+                  className="flex items-center justify-center gap-2 py-3 px-4 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium rounded-xl text-xs transition-all"
+                >
+                  {copiedLink ? <Check className="w-4 h-4 text-emerald-400" /> : <Share2 className="w-4 h-4" />}
+                  <span>{copiedLink ? 'Link Copied!' : 'Share Proof Link'}</span>
+                </button>
+              </>
+            )}
+            <button
+              onClick={reset}
+              className="py-3 px-4 bg-slate-900 border border-slate-800 text-slate-400 hover:text-white rounded-xl text-xs transition-all"
+            >
+              Verify Another
+            </button>
+          </div>
         </div>
       </div>
     );
