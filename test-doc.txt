@@ -1,0 +1,2 @@
+Hello FileGuard! This is a test document for SHA-256 stream hashing verification.
+Created by Aashif Khan - August 2026.

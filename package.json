@@ -1,0 +1,32 @@
+{
+  "name": "fileguard-ai",
+  "version": "1.0.0",
+  "description": "FileGuard — Document Integrity & Authenticity Verification Platform. Zero-RAM stream hashing with SHA-256 and blockchain anchoring via OriginStamp.",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "build:client": "cd client && npm install && npm run build",
+    "postinstall": "cd client && npm install"
+  },
+  "keywords": [
+    "document-integrity",
+    "sha256",
+    "blockchain",
+    "originstamp",
+    "file-verification"
+  ],
+  "author": "Aashif Khan",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.0.0",
+    "mongoose": "^8.9.5",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1"
+  }
+}
