@@ -23,6 +23,7 @@ import { connectDB, disconnectDB } from './config/db.js';
 import { helmetConfig, corsConfig } from './config/security.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import apiRouter from './routes/documentRoutes.js';
+import authRouter from './routes/authRoutes.js';
 
 // ── ES Module __dirname equivalent ──
 const __filename = fileURLToPath(import.meta.url);
@@ -78,6 +79,7 @@ async function startServer() {
   });
 
   // ── 8. API Routes ──
+  app.use('/api/auth', authRouter);
   app.use('/api', apiRouter);
 
   // ── 9. Serve React Frontend (Production) ──

@@ -1,11 +1,8 @@
 import { useState } from 'react';
-import { ShieldCheck, Copy, Check, RotateCcw, FileText, Clock, Hash, Blocks, Timer } from 'lucide-react';
+import { ShieldCheck, Copy, Check, RotateCcw, FileText, Clock, Hash, Blocks, Building, Share2 } from 'lucide-react';
 
-/**
- * Formats bytes into human-readable string.
- */
 function formatBytes(bytes) {
-  if (bytes === 0) return '0 B';
+  if (!bytes || bytes === 0) return '0 B';
   const k = 1024;
   const sizes = ['B', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
@@ -13,58 +10,75 @@ function formatBytes(bytes) {
 }
 
 export default function HashResult({ data, onReset }) {
-  const [copied, setCopied] = useState(false);
+  const [copiedHash, setCopiedHash] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
   const doc = data.document;
 
   const copyHash = async () => {
     await navigator.clipboard.writeText(doc.originalHash);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setCopiedHash(true);
+    setTimeout(() => setCopiedHash(false), 2000);
+  };
+
+  const copyVerificationLink = async () => {
+    const url = `${window.location.origin}/verify`;
+    await navigator.clipboard.writeText(url);
+    setCopiedLink(true);
+    setTimeout(() => setCopiedLink(false), 2000);
   };
 
   return (
     <div className="max-w-2xl mx-auto animate-slide-up">
       {/* Success Header */}
       <div className="text-center mb-6">
-        <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-emerald-500/10 mb-4">
-          <ShieldCheck className="w-8 h-8 text-emerald-400" />
+        <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-blue-500/10 mb-4 border border-blue-500/20">
+          <ShieldCheck className="w-8 h-8 text-blue-400" />
         </div>
         <h2 className="text-2xl font-bold text-white">
-          {data.duplicate ? 'Already Secured' : 'Document Secured'}
+          {data.duplicate ? 'Existing Record Found' : 'Cryptographic Proof Registered'}
         </h2>
         <p className="text-slate-400 text-sm mt-1">
           {data.duplicate
-            ? 'This file was already anchored with the same hash.'
-            : 'SHA-256 fingerprint computed and anchored to blockchain.'}
+            ? 'This exact document fingerprint is already anchored in the ledger.'
+            : 'SHA-256 fingerprint anchored and associated with your verified issuer identity.'}
         </p>
       </div>
 
       {/* Result Card */}
-      <div className="glass-card p-6 glow-accent space-y-5">
+      <div className="glass-card p-6 rounded-2xl border border-slate-800 space-y-5">
+        {/* Issuer Info */}
+        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+          <div className="flex items-center gap-2">
+            <Building className="w-4 h-4 text-blue-400" />
+            <span className="text-xs text-slate-400">Registered Issuer</span>
+          </div>
+          <span className="text-sm font-semibold text-white">{doc.issuerName || 'Verified Organization'}</span>
+        </div>
+
         {/* File Name */}
         <div className="flex items-start gap-3">
-          <FileText className="w-4 h-4 text-slate-500 mt-0.5 shrink-0" />
+          <FileText className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" />
           <div className="min-w-0">
-            <p className="text-xs text-slate-500 mb-0.5">File Name</p>
+            <p className="text-xs text-slate-400 mb-0.5">File Name</p>
             <p className="text-white text-sm font-medium truncate">{doc.fileName}</p>
           </div>
         </div>
 
         {/* SHA-256 Hash */}
         <div className="flex items-start gap-3">
-          <Hash className="w-4 h-4 text-slate-500 mt-0.5 shrink-0" />
+          <Hash className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" />
           <div className="min-w-0 flex-1">
-            <div className="flex items-center justify-between mb-0.5">
-              <p className="text-xs text-slate-500">SHA-256 Hash</p>
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-xs text-slate-400">Cryptographic SHA-256 Fingerprint</p>
               <button
                 onClick={copyHash}
-                className="flex items-center gap-1 text-xs text-slate-500 hover:text-emerald-400 transition-colors"
+                className="flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 transition-colors"
               >
-                {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-                {copied ? 'Copied!' : 'Copy'}
+                {copiedHash ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                {copiedHash ? 'Copied!' : 'Copy Hash'}
               </button>
             </div>
-            <p className="hash-text text-emerald-300/80 bg-dark-800/50 rounded-lg p-3 border border-glass-border">
+            <p className="font-mono text-xs text-blue-300 bg-slate-900/90 rounded-lg p-3 border border-slate-800 break-all select-all">
               {doc.originalHash}
             </p>
           </div>
@@ -73,54 +87,56 @@ export default function HashResult({ data, onReset }) {
         {/* Metadata Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-2">
           <div>
-            <p className="text-xs text-slate-500 mb-1">File Size</p>
+            <p className="text-xs text-slate-400 mb-1">File Size</p>
             <p className="text-sm text-white font-medium">{formatBytes(doc.fileSizeBytes)}</p>
           </div>
           <div>
-            <p className="text-xs text-slate-500 mb-1">Processing Time</p>
-            <p className="text-sm text-white font-medium flex items-center gap-1">
-              <Timer className="w-3 h-3 text-cyan-400" />
-              {doc.processingTimeMs}ms
-            </p>
+            <p className="text-xs text-slate-400 mb-1">Privacy Guarantee</p>
+            <p className="text-xs text-emerald-400 font-medium">Zero-Knowledge</p>
           </div>
           <div>
-            <p className="text-xs text-slate-500 mb-1">Status</p>
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-medium">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-glow" />
-              {doc.status}
+            <p className="text-xs text-slate-400 mb-1">Ledger Status</p>
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 text-xs font-semibold">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+              {doc.status === 'mock' ? 'Simulated Ledger' : doc.status}
             </span>
           </div>
-          <div>
-            <p className="text-xs text-slate-500 mb-1">Algorithm</p>
-            <p className="text-sm text-white font-mono">{doc.hashAlgorithm?.toUpperCase()}</p>
-          </div>
-          <div className="col-span-2">
-            <p className="text-xs text-slate-500 mb-1 flex items-center gap-1">
-              <Blocks className="w-3 h-3" /> Blockchain TX
+          <div className="col-span-2 sm:col-span-3">
+            <p className="text-xs text-slate-400 mb-1 flex items-center gap-1">
+              <Blocks className="w-3 h-3" /> OriginStamp Anchor ID
             </p>
-            <p className="hash-text text-amber-300/70 text-[10px] truncate">
-              {doc.originStampTxId || 'Pending...'}
+            <p className="font-mono text-slate-400 text-[11px] truncate bg-slate-900/50 p-2 rounded-lg border border-slate-800/80">
+              {doc.originStampTxId || 'Pending ledger mining...'}
             </p>
           </div>
         </div>
 
         {/* Timestamp */}
-        <div className="flex items-center gap-2 pt-2 border-t border-glass-border">
-          <Clock className="w-3.5 h-3.5 text-slate-500" />
-          <p className="text-xs text-slate-500">
-            Anchored: {new Date(doc.createdAt || doc.originStampTimestamp).toLocaleString()}
-          </p>
+        <div className="flex items-center justify-between pt-3 border-t border-slate-800 text-xs text-slate-400">
+          <div className="flex items-center gap-1.5">
+            <Clock className="w-3.5 h-3.5 text-slate-400" />
+            <span>Anchored: {new Date(doc.createdAt || doc.originStampTimestamp).toLocaleString()}</span>
+          </div>
+          <button
+            onClick={copyVerificationLink}
+            className="flex items-center gap-1 text-blue-400 hover:text-blue-300 font-medium"
+          >
+            <Share2 className="w-3.5 h-3.5" />
+            {copiedLink ? 'Link Copied!' : 'Share Public Verifier'}
+          </button>
         </div>
       </div>
 
-      {/* Reset Button */}
-      <button
-        onClick={onReset}
-        className="mt-6 w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-slate-700 text-slate-400 hover:text-white hover:border-slate-500 transition-all text-sm"
-      >
-        <RotateCcw className="w-4 h-4" />
-        Upload Another Document
-      </button>
+      {/* Action Buttons */}
+      <div className="mt-6 flex gap-3">
+        <button
+          onClick={onReset}
+          className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-medium text-sm transition-all border border-slate-700"
+        >
+          <RotateCcw className="w-4 h-4" />
+          Anchor Another Document
+        </button>
+      </div>
     </div>
   );
 }

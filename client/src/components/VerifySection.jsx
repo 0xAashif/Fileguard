@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
-import { ShieldCheck, ShieldAlert, Search, UploadCloud, Loader2, FileText } from 'lucide-react';
+import { ShieldCheck, ShieldAlert, Search, UploadCloud, Loader2, FileText, Building, Hash, Calendar, CheckCircle2 } from 'lucide-react';
 import { verifyByFile, verifyByHash } from '../lib/api.js';
 
 export default function VerifySection() {
@@ -21,7 +21,7 @@ export default function VerifySection() {
       setResult(data);
       setState('result');
     } catch (err) {
-      setError(err.response?.data?.error || err.message);
+      setError(err.response?.data?.error || err.response?.data?.message || err.message);
       setState('idle');
     }
   }, []);
@@ -30,7 +30,7 @@ export default function VerifySection() {
   const handleHashVerify = async () => {
     const cleaned = hashInput.trim().toLowerCase();
     if (!/^[a-f0-9]{64}$/.test(cleaned)) {
-      setError('Invalid hash. Must be a 64-character hexadecimal string.');
+      setError('Invalid hash. Must be a 64-character SHA-256 hexadecimal string.');
       return;
     }
     setState('loading');
@@ -40,7 +40,7 @@ export default function VerifySection() {
       setResult(data);
       setState('result');
     } catch (err) {
-      setError(err.response?.data?.error || err.message);
+      setError(err.response?.data?.error || err.response?.data?.message || err.message);
       setState('idle');
     }
   };
@@ -55,54 +55,78 @@ export default function VerifySection() {
   // ── Result Display ──
   if (state === 'result' && result) {
     const isAuthentic = result.verified;
+    const doc = result.document;
+
     return (
       <div className="max-w-2xl mx-auto animate-slide-up">
-        <div className={`
-          glass-card p-8 text-center
-          ${isAuthentic ? 'glow-accent border-emerald-500/30' : 'glow-danger border-rose-500/30'}
-        `}>
-          <div className={`
-            inline-flex items-center justify-center p-4 rounded-2xl mb-4
-            ${isAuthentic ? 'bg-emerald-500/10' : 'bg-rose-500/10'}
-          `}>
-            {isAuthentic
-              ? <ShieldCheck className="w-10 h-10 text-emerald-400" />
-              : <ShieldAlert className="w-10 h-10 text-rose-400" />
-            }
+        <div
+          className={`glass-card p-8 rounded-2xl text-center border ${
+            isAuthentic ? 'border-blue-500/30 bg-blue-500/5' : 'border-red-500/30 bg-red-500/5'
+          }`}
+        >
+          <div
+            className={`inline-flex items-center justify-center p-4 rounded-2xl mb-4 ${
+              isAuthentic ? 'bg-blue-500/10' : 'bg-red-500/10'
+            }`}
+          >
+            {isAuthentic ? (
+              <ShieldCheck className="w-12 h-12 text-blue-400" />
+            ) : (
+              <ShieldAlert className="w-12 h-12 text-red-400" />
+            )}
           </div>
 
-          <h2 className={`text-2xl font-bold mb-2 ${isAuthentic ? 'text-emerald-400' : 'text-rose-400'}`}>
-            {isAuthentic ? 'Document is Authentic ✓' : 'Document Not Found ✗'}
+          <h2 className={`text-2xl font-bold mb-2 ${isAuthentic ? 'text-white' : 'text-red-400'}`}>
+            {isAuthentic ? 'Cryptographically Authentic' : 'Verification Failed'}
           </h2>
 
           <p className="text-slate-400 text-sm mb-6">{result.message}</p>
 
-          {isAuthentic && result.document && (
-            <div className="text-left space-y-3 p-4 rounded-xl bg-dark-800/50 border border-glass-border">
-              <div className="flex justify-between text-sm">
-                <span className="text-slate-500">File</span>
-                <span className="text-white">{result.document.fileName}</span>
+          {isAuthentic && doc && (
+            <div className="text-left space-y-3 p-5 rounded-xl bg-slate-900/80 border border-slate-800 text-xs">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                <span className="text-slate-400 flex items-center gap-1.5">
+                  <Building className="w-4 h-4 text-blue-400" /> Verified Issuer
+                </span>
+                <span className="text-white font-semibold text-sm">{doc.issuerName}</span>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-slate-500">Status</span>
-                <span className="text-emerald-400 font-medium">{result.document.status}</span>
+
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400">Document Name</span>
+                <span className="text-white font-medium truncate max-w-[220px]">{doc.fileName}</span>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-slate-500">Verified</span>
-                <span className="text-white">{result.document.verificationCount} times</span>
+
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400">Cryptographic Hash</span>
+                <span className="font-mono text-slate-300">
+                  {doc.originalHash.slice(0, 10)}...{doc.originalHash.slice(-10)}
+                </span>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-slate-500">First Anchored</span>
-                <span className="text-white">{new Date(result.document.createdAt).toLocaleDateString()}</span>
+
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400">Anchor Timestamp</span>
+                <span className="text-slate-200">
+                  {new Date(doc.originStampTimestamp || doc.createdAt).toLocaleString()}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400">Ledger Status</span>
+                <span className="text-blue-400 font-semibold uppercase">{doc.status}</span>
+              </div>
+
+              <div className="flex items-center justify-between pt-2 border-t border-slate-800 text-slate-400">
+                <span>Verification Count</span>
+                <span>{doc.verificationCount} audit checks</span>
               </div>
             </div>
           )}
 
           <button
             onClick={reset}
-            className="mt-6 px-6 py-2.5 rounded-xl border border-slate-700 text-slate-400 hover:text-white hover:border-slate-500 transition-all text-sm"
+            className="mt-6 px-6 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-200 hover:text-white hover:border-slate-600 transition-all text-xs font-semibold"
           >
-            Verify Another
+            Verify Another Document
           </button>
         </div>
       </div>
@@ -112,84 +136,113 @@ export default function VerifySection() {
   return (
     <div className="max-w-2xl mx-auto animate-fade-in">
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-white mb-2">Verify Integrity</h2>
+        <h2 className="text-2xl font-bold text-white mb-2">Public Document Verification</h2>
         <p className="text-slate-400 text-sm">
-          Check if a document has been tampered with since it was anchored.
+          Independently verify any document against the cryptographic registry without creating an account.
         </p>
       </div>
 
       {/* Tab Switcher */}
-      <div className="flex gap-1 p-1 rounded-xl bg-dark-800/80 border border-glass-border mb-8">
+      <div className="flex gap-1 p-1 rounded-xl bg-slate-900/80 border border-slate-800 mb-8">
         <button
-          onClick={() => { setTab('file'); setError(''); }}
+          onClick={() => {
+            setTab('file');
+            setError('');
+          }}
           className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${
-            tab === 'file' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'text-slate-400 hover:text-white'
+            tab === 'file'
+              ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30'
+              : 'text-slate-400 hover:text-white'
           }`}
         >
           <FileText className="w-4 h-4" />
           Verify by File
         </button>
         <button
-          onClick={() => { setTab('hash'); setError(''); }}
+          onClick={() => {
+            setTab('hash');
+            setError('');
+          }}
           className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${
-            tab === 'hash' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'text-slate-400 hover:text-white'
+            tab === 'hash'
+              ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30'
+              : 'text-slate-400 hover:text-white'
           }`}
         >
           <Search className="w-4 h-4" />
-          Verify by Hash
+          Verify by SHA-256 Hash
         </button>
       </div>
 
       {/* Tab Content */}
       {tab === 'file' ? (
         <div
-          className={`glass-card p-10 text-center cursor-pointer transition-all ${
-            dragActive ? 'border-cyan-400/50 bg-cyan-400/5 glow-cyan' : ''
+          className={`glass-card p-10 text-center cursor-pointer rounded-2xl border transition-all ${
+            dragActive ? 'border-blue-500 bg-blue-500/10' : 'border-slate-800'
           } ${state === 'loading' ? 'pointer-events-none opacity-70' : ''}`}
-          onDrop={(e) => { e.preventDefault(); setDragActive(false); handleFileVerify(e.dataTransfer?.files?.[0]); }}
-          onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
+          onDrop={(e) => {
+            e.preventDefault();
+            setDragActive(false);
+            handleFileVerify(e.dataTransfer?.files?.[0]);
+          }}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragActive(true);
+          }}
           onDragLeave={() => setDragActive(false)}
-          onClick={() => state !== 'loading' && inputRef.current?.click()}
+          onClick={() => inputRef.current?.click()}
         >
-          <input ref={inputRef} type="file" className="hidden" onChange={(e) => handleFileVerify(e.target.files?.[0])} />
+          <input
+            ref={inputRef}
+            type="file"
+            className="hidden"
+            onChange={(e) => handleFileVerify(e.target.files?.[0])}
+          />
           {state === 'loading' ? (
-            <Loader2 className="w-10 h-10 text-cyan-400 mx-auto animate-spin" />
+            <div className="space-y-3">
+              <Loader2 className="w-10 h-10 text-blue-400 mx-auto animate-spin" />
+              <p className="text-white text-sm font-medium">Computing local hash and querying registry...</p>
+            </div>
           ) : (
-            <>
-              <UploadCloud className={`w-10 h-10 mx-auto mb-3 ${dragActive ? 'text-cyan-400' : 'text-slate-500'}`} />
-              <p className="text-white font-medium">Drop file to verify</p>
-              <p className="text-slate-500 text-sm mt-1">We'll compute its hash and check against anchored records</p>
-            </>
+            <div className="space-y-3">
+              <UploadCloud className="w-10 h-10 text-slate-400 mx-auto" />
+              <p className="text-white font-medium text-sm">Drop document here to verify authenticity</p>
+              <p className="text-slate-400 text-xs">Zero-Knowledge: The file is hashed in your browser only</p>
+            </div>
           )}
         </div>
       ) : (
-        <div className="glass-card p-6 space-y-4">
-          <label className="block">
-            <span className="text-xs text-slate-500 mb-1.5 block">SHA-256 Hash</span>
+        <div className="glass-card p-8 rounded-2xl border border-slate-800 space-y-4">
+          <div>
+            <label className="block text-xs font-medium text-slate-400 mb-2">
+              Enter 64-Character SHA-256 Hash
+            </label>
             <input
               type="text"
               value={hashInput}
               onChange={(e) => setHashInput(e.target.value)}
-              placeholder="Enter 64-character hex hash..."
-              className="w-full px-4 py-3 rounded-xl bg-dark-800/80 border border-glass-border text-white font-mono text-sm placeholder:text-slate-600 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all"
-              maxLength={64}
+              placeholder="e.g. e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              className="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-800 text-white font-mono text-xs placeholder:text-slate-600 focus:outline-none focus:border-blue-500"
             />
-          </label>
-          <p className="text-xs text-slate-600">{hashInput.length}/64 characters</p>
+          </div>
           <button
             onClick={handleHashVerify}
-            disabled={hashInput.length !== 64 || state === 'loading'}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:bg-slate-700 disabled:text-slate-500 text-dark-950 font-semibold text-sm transition-all"
+            disabled={state === 'loading' || !hashInput.trim()}
+            className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl shadow-md transition-all flex items-center justify-center space-x-2 disabled:opacity-50"
           >
-            {state === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-            Verify Hash
+            {state === 'loading' ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <span>Verify Cryptographic Record</span>
+            )}
           </button>
         </div>
       )}
 
-      {/* Error */}
       {error && (
-        <p className="mt-4 text-rose-400 text-sm text-center animate-fade-in">{error}</p>
+        <div className="mt-4 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-xs text-center">
+          {error}
+        </div>
       )}
     </div>
   );
