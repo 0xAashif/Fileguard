@@ -50,7 +50,9 @@ export const helmetConfig = {
  * CORS configuration — controls which origins can access the API.
  */
 export const corsConfig = {
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  origin: process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(',').map((s) => s.trim())
+    : ['http://localhost:5173', 'http://localhost:5000'],
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   // Expose custom headers so the frontend can read them

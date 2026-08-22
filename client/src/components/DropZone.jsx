@@ -86,7 +86,7 @@ export default function DropZone() {
     <div className="max-w-2xl mx-auto animate-fade-in">
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold text-white mb-2">Cryptographic Document Registry</h2>
-        <p className="text-slate-400 text-sm">
+        <p className="text-zinc-400 text-sm">
           Zero-Knowledge Architecture: Files are hashed in your browser and never leave your machine.
         </p>
       </div>
@@ -94,8 +94,8 @@ export default function DropZone() {
       {/* Drop Zone Card */}
       <div
         className={`
-          glass-card p-12 text-center rounded-2xl cursor-pointer transition-all duration-300 relative overflow-hidden
-          ${state === 'dragging' ? 'border-blue-500 bg-blue-500/10' : ''}
+          glass-card p-12 text-center cursor-pointer transition-all duration-200 relative overflow-hidden
+          ${state === 'dragging' ? 'border-amber-500 bg-amber-500/5' : ''}
           ${state === 'error' ? 'border-red-500/50 bg-red-500/5' : ''}
           ${isWorking ? 'pointer-events-none opacity-80' : ''}
         `}
@@ -113,24 +113,24 @@ export default function DropZone() {
 
         {isWorking ? (
           <div className="space-y-4">
-            <Loader2 className="w-12 h-12 text-blue-400 mx-auto animate-spin" />
+            <Loader2 className="w-12 h-12 text-amber-400 mx-auto animate-spin" />
             <p className="text-white font-medium">
               {state === 'hashing' && 'Computing SHA-256 in browser (Zero-Knowledge)...'}
               {state === 'anchoring' && 'Registering cryptographic proof on ledger...'}
               {state === 'uploading' && 'Preparing cryptographic session...'}
             </p>
-            <p className="text-slate-400 text-sm">{fileName}</p>
+            <p className="text-zinc-400 text-sm">{fileName}</p>
           </div>
         ) : (
           <div className="space-y-4">
             <div
-              className={`p-4 rounded-2xl mx-auto w-fit transition-colors ${
-                state === 'dragging' ? 'bg-blue-500/20' : 'bg-white/5'
+              className={`p-4 rounded-xl mx-auto w-fit transition-colors ${
+                state === 'dragging' ? 'bg-amber-500/10' : 'bg-white/5'
               }`}
             >
               <UploadCloud
                 className={`w-10 h-10 ${
-                  state === 'dragging' ? 'text-blue-400' : 'text-slate-400'
+                  state === 'dragging' ? 'text-amber-400' : 'text-zinc-400'
                 }`}
               />
             </div>
@@ -138,9 +138,9 @@ export default function DropZone() {
               <p className="text-white font-medium">
                 {state === 'dragging' ? 'Release document to anchor' : 'Drag & drop file to anchor'}
               </p>
-              <p className="text-slate-400 text-sm mt-1">or click to browse from device</p>
+              <p className="text-zinc-400 text-sm mt-1">or click to browse from device</p>
             </div>
-            <div className="flex items-center justify-center gap-4 text-xs text-slate-400 pt-2">
+            <div className="flex items-center justify-center gap-4 text-xs text-zinc-500 pt-2">
               <span>Client-Side SHA-256</span>
               <span>•</span>
               <span>100% Zero-Knowledge Privacy</span>
@@ -150,10 +150,10 @@ export default function DropZone() {
       </div>
 
       {/* Issuer Status Banner */}
-      <div className="mt-4 p-3 bg-slate-900/60 border border-slate-800 rounded-xl flex items-center justify-between text-xs text-slate-400">
+      <div className="mt-4 p-3 bg-zinc-900/60 border border-zinc-800 rounded-xl flex items-center justify-between text-xs text-zinc-400">
         {user ? (
           <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-blue-400" />
+            <ShieldCheck className="w-4 h-4 text-amber-400" />
             <span>
               Anchoring as verified issuer: <strong className="text-white">{user.issuerName}</strong> ({user.email})
             </span>
@@ -166,7 +166,7 @@ export default function DropZone() {
             </div>
             <button
               onClick={() => setAuthModalOpen(true)}
-              className="text-blue-400 hover:underline font-semibold ml-2 shrink-0"
+              className="text-amber-400 hover:underline font-semibold ml-2 shrink-0"
             >
               Sign In
             </button>

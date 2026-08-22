@@ -25,26 +25,26 @@ export default function Navbar() {
 
   const linkClass = ({ isActive }) =>
     `relative px-3 py-2 text-sm font-medium transition-colors duration-200 ${
-      isActive ? 'text-blue-400 font-semibold' : 'text-slate-400 hover:text-white'
+      isActive ? 'text-amber-400 font-semibold' : 'text-zinc-400 hover:text-white'
     }`;
 
   const activeBar = ({ isActive }) =>
     isActive ? (
-      <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4/5 h-0.5 bg-blue-500 rounded-full" />
+      <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4/5 h-0.5 bg-amber-500 rounded-full" />
     ) : null;
 
   return (
     <>
-      <nav className="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
+      <nav className="sticky top-0 z-50 bg-zinc-950/95 border-b border-zinc-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <NavLink to="/" className="flex items-center gap-2.5 group">
-              <div className="p-1.5 rounded-lg bg-blue-500/10 group-hover:bg-blue-500/20 transition-colors">
-                <Shield className="w-5 h-5 text-blue-400" />
+              <div className="p-1.5 rounded-lg bg-amber-500/10 group-hover:bg-amber-500/20 transition-colors">
+                <Shield className="w-5 h-5 text-amber-400" />
               </div>
               <span className="text-lg font-bold text-white tracking-tight">
-                File<span className="text-blue-400">Guard</span>
+                File<span className="text-amber-400">Guard</span>
               </span>
             </NavLink>
 
@@ -70,14 +70,14 @@ export default function Navbar() {
             <div className="hidden md:flex items-center gap-3">
               {user ? (
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-xs text-slate-200">
-                    <User className="w-3.5 h-3.5 text-blue-400" />
+                  <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-lg text-xs text-zinc-200">
+                    <User className="w-3.5 h-3.5 text-amber-400" />
                     <span className="font-medium text-white">{user.issuerName}</span>
                   </div>
                   <button
                     onClick={handleLogout}
                     title="Sign Out"
-                    className="p-1.5 text-slate-400 hover:text-red-400 transition-colors"
+                    className="p-1.5 text-zinc-400 hover:text-red-400 transition-colors"
                   >
                     <LogOut className="w-4 h-4" />
                   </button>
@@ -85,7 +85,7 @@ export default function Navbar() {
               ) : (
                 <button
                   onClick={() => setAuthModalOpen(true)}
-                  className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors"
+                  className="flex items-center gap-1.5 px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold rounded-lg transition-colors"
                 >
                   <Lock className="w-3.5 h-3.5" />
                   <span>Issuer Sign In</span>
@@ -95,7 +95,7 @@ export default function Navbar() {
 
             {/* Mobile Menu Toggle */}
             <button
-              className="md:hidden p-2 text-slate-400 hover:text-white"
+              className="md:hidden p-2 text-zinc-400 hover:text-white"
               onClick={() => setMobileOpen(!mobileOpen)}
             >
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -104,12 +104,12 @@ export default function Navbar() {
 
           {/* Mobile Menu */}
           {mobileOpen && (
-            <div className="md:hidden pb-4 space-y-2 animate-fade-in border-t border-slate-800 pt-3">
-              <NavLink to="/" end className="block px-3 py-2 text-sm text-slate-300 hover:text-white" onClick={() => setMobileOpen(false)}>Home</NavLink>
-              <NavLink to="/upload" className="block px-3 py-2 text-sm text-slate-300 hover:text-white" onClick={() => setMobileOpen(false)}>Anchor</NavLink>
-              <NavLink to="/verify" className="block px-3 py-2 text-sm text-slate-300 hover:text-white" onClick={() => setMobileOpen(false)}>Verify</NavLink>
+            <div className="md:hidden pb-4 space-y-2 animate-fade-in border-t border-zinc-800 pt-3">
+              <NavLink to="/" end className="block px-3 py-2 text-sm text-zinc-300 hover:text-white" onClick={() => setMobileOpen(false)}>Home</NavLink>
+              <NavLink to="/upload" className="block px-3 py-2 text-sm text-zinc-300 hover:text-white" onClick={() => setMobileOpen(false)}>Anchor</NavLink>
+              <NavLink to="/verify" className="block px-3 py-2 text-sm text-zinc-300 hover:text-white" onClick={() => setMobileOpen(false)}>Verify</NavLink>
               {user && (
-                <NavLink to="/documents" className="block px-3 py-2 text-sm text-slate-300 hover:text-white" onClick={() => setMobileOpen(false)}>My Documents</NavLink>
+                <NavLink to="/documents" className="block px-3 py-2 text-sm text-zinc-300 hover:text-white" onClick={() => setMobileOpen(false)}>My Documents</NavLink>
               )}
               {!user ? (
                 <button
@@ -117,7 +117,7 @@ export default function Navbar() {
                     setMobileOpen(false);
                     setAuthModalOpen(true);
                   }}
-                  className="w-full text-left px-3 py-2 text-sm text-blue-400 font-semibold"
+                  className="w-full text-left px-3 py-2 text-sm text-amber-400 font-semibold"
                 >
                   Issuer Sign In
                 </button>

@@ -1,26 +1,24 @@
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════════
-   FILEGUARD — Dark Glassmorphism Theme
+   FILEGUARD — Neo-Swiss Amber Theme
+   Inspired by Linear, Vercel, Raycast.
    ═══════════════════════════════════════════ */
 
 @theme {
-  --color-dark-950: #04060b;
-  --color-dark-900: #0a0e1a;
-  --color-dark-800: #111827;
-  --color-dark-700: #1e293b;
-  --color-dark-600: #334155;
+  --color-dark-950: #09090b;
+  --color-dark-900: #18181b;
+  --color-dark-800: #27272a;
+  --color-dark-700: #3f3f46;
+  --color-dark-600: #52525b;
   --color-glass: rgba(255, 255, 255, 0.03);
   --color-glass-border: rgba(255, 255, 255, 0.08);
-  --color-glass-hover: rgba(255, 255, 255, 0.06);
-  --color-accent: #10b981;
-  --color-accent-glow: rgba(16, 185, 129, 0.15);
-  --color-accent-bright: #34d399;
-  --color-danger: #f43f5e;
-  --color-danger-glow: rgba(244, 63, 94, 0.15);
-  --color-warn: #f59e0b;
-  --color-cyan: #06b6d4;
-  --color-cyan-glow: rgba(6, 182, 212, 0.15);
+  --color-glass-hover: rgba(255, 255, 255, 0.05);
+  --color-accent: #f59e0b;
+  --color-accent-glow: rgba(245, 158, 11, 0.15);
+  --color-accent-bright: #fbbf24;
+  --color-danger: #ef4444;
+  --color-danger-glow: rgba(239, 68, 68, 0.15);
   --font-sans: 'Inter', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 }
@@ -33,17 +31,39 @@ html {
 body {
   font-family: var(--font-sans);
   background: var(--color-dark-950);
-  color: #e2e8f0;
+  color: #e4e4e7;
   min-height: 100vh;
 }
 
-/* ── Glassmorphism Card ── */
+/* ── Interactive Dot-Grid Background ── */
+.animated-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.06) 1px, transparent 0);
+  background-size: 40px 40px;
+}
+
+/* Cursor spotlight overlay — uses CSS vars set by React */
+.animated-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    600px circle at var(--x) var(--y),
+    rgba(245, 158, 11, 0.04),
+    transparent 40%
+  );
+  transition: opacity 0.3s ease-out;
+  pointer-events: auto;
+}
+
+/* ── Cards — Solid, no glassmorphism blur ── */
 .glass-card {
   background: var(--color-glass);
   border: 1px solid var(--color-glass-border);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 16px;
+  border-radius: 12px;
 }
 
 .glass-card:hover {
@@ -51,59 +71,24 @@ body {
   border-color: rgba(255, 255, 255, 0.12);
 }
 
-/* ── Glow Effects ── */
-.glow-accent {
-  box-shadow: 0 0 30px var(--color-accent-glow), 0 0 60px rgba(16, 185, 129, 0.05);
-}
-
-.glow-danger {
-  box-shadow: 0 0 30px var(--color-danger-glow), 0 0 60px rgba(244, 63, 94, 0.05);
-}
-
-.glow-cyan {
-  box-shadow: 0 0 30px var(--color-cyan-glow);
-}
-
-/* ── Animations ── */
+/* ── Animations — ease-out only, no bounce ── */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(24px); }
+  from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes pulseGlow {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 1; }
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
 .animate-fade-in {
-  animation: fadeIn 0.5s ease-out forwards;
+  animation: fadeIn 0.4s ease-out forwards;
 }
 
 .animate-slide-up {
-  animation: slideUp 0.6s ease-out forwards;
+  animation: slideUp 0.5s ease-out forwards;
 }
-
-.animate-pulse-glow {
-  animation: pulseGlow 2s ease-in-out infinite;
-}
-
-/* Stagger children animations */
-.stagger > *:nth-child(1) { animation-delay: 0ms; }
-.stagger > *:nth-child(2) { animation-delay: 80ms; }
-.stagger > *:nth-child(3) { animation-delay: 160ms; }
-.stagger > *:nth-child(4) { animation-delay: 240ms; }
-.stagger > *:nth-child(5) { animation-delay: 320ms; }
-.stagger > *:nth-child(6) { animation-delay: 400ms; }
 
 /* ── Custom Scrollbar ── */
 ::-webkit-scrollbar {
@@ -115,12 +100,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.16);
 }
 
 /* ── Hash Display ── */
@@ -130,38 +115,4 @@ body {
   letter-spacing: 0.05em;
   word-break: break-all;
   line-height: 1.6;
-}
-
-/* ── Gradient Orbs (Background) ── */
-.orb {
-  position: fixed;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.15;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.orb-1 {
-  width: 500px;
-  height: 500px;
-  background: var(--color-accent);
-  top: -100px;
-  right: -100px;
-}
-
-.orb-2 {
-  width: 400px;
-  height: 400px;
-  background: var(--color-cyan);
-  bottom: -50px;
-  left: -100px;
-}
-
-.orb-3 {
-  width: 300px;
-  height: 300px;
-  background: #8b5cf6;
-  top: 40%;
-  left: 30%;
 }

@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
+import AnimatedBackground from './components/AnimatedBackground.jsx';
 import Navbar from './components/Navbar.jsx';
 import Hero from './components/Hero.jsx';
 import DropZone from './components/DropZone.jsx';
@@ -9,6 +10,7 @@ import Footer from './components/Footer.jsx';
 export default function App() {
   return (
     <div className="min-h-screen flex flex-col">
+      <AnimatedBackground />
       <Navbar />
 
       <main className="flex-1 relative z-10 py-12 px-4">

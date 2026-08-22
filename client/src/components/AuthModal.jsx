@@ -34,11 +34,11 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 animate-fade-in">
+      <div className="bg-zinc-950 border border-zinc-800 rounded-xl w-full max-w-md p-6 shadow-2xl relative">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors"
+          className="absolute top-4 right-4 text-zinc-400 hover:text-white transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
@@ -47,7 +47,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
           <h3 className="text-xl font-bold text-white mb-1">
             {isLogin ? 'Issuer Sign In' : 'Register Organization'}
           </h3>
-          <p className="text-slate-400 text-xs">
+          <p className="text-zinc-400 text-xs">
             {isLogin
               ? 'Sign in to cryptographically anchor and manage documents'
               : 'Create a verified issuer identity on FileGuard'}
@@ -63,53 +63,53 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
         <form onSubmit={handleSubmit} className="space-y-4">
           {!isLogin && (
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-medium text-zinc-300 mb-1">
                 Organization / Issuer Name
               </label>
               <div className="relative">
-                <Building className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                <Building className="w-4 h-4 text-zinc-500 absolute left-3 top-3" />
                 <input
                   type="text"
                   required
                   placeholder="e.g. Acme Corp or Stanford Univ"
                   value={issuerName}
                   onChange={(e) => setIssuerName(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500"
+                  className="w-full pl-9 pr-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500"
                 />
               </div>
             </div>
           )}
 
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">
+            <label className="block text-xs font-medium text-zinc-300 mb-1">
               Email Address
             </label>
             <div className="relative">
-              <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+              <Mail className="w-4 h-4 text-zinc-500 absolute left-3 top-3" />
               <input
                 type="email"
                 required
                 placeholder="issuer@organization.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500"
+                className="w-full pl-9 pr-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">
+            <label className="block text-xs font-medium text-zinc-300 mb-1">
               Password
             </label>
             <div className="relative">
-              <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+              <Lock className="w-4 h-4 text-zinc-500 absolute left-3 top-3" />
               <input
                 type="password"
                 required
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500"
+                className="w-full pl-9 pr-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500"
               />
             </div>
           </div>
@@ -117,14 +117,14 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-lg shadow-md transition-all flex items-center justify-center space-x-2 disabled:opacity-50"
+            className="w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-white text-sm font-semibold rounded-lg transition-all flex items-center justify-center space-x-2 disabled:opacity-50"
           >
             {loading && <Loader2 className="w-4 h-4 animate-spin" />}
             <span>{isLogin ? 'Sign In' : 'Create Issuer Account'}</span>
           </button>
         </form>
 
-        <div className="mt-4 text-center text-xs text-slate-400">
+        <div className="mt-4 text-center text-xs text-zinc-400">
           {isLogin ? (
             <p>
               Don't have an issuer account?{' '}
@@ -133,7 +133,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
                   setIsLogin(false);
                   setError('');
                 }}
-                className="text-blue-400 hover:underline font-medium"
+                className="text-amber-400 hover:underline font-medium"
               >
                 Register
               </button>
@@ -146,7 +146,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
                   setIsLogin(true);
                   setError('');
                 }}
-                className="text-blue-400 hover:underline font-medium"
+                className="text-amber-400 hover:underline font-medium"
               >
                 Sign In
               </button>
