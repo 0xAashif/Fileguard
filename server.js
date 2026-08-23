@@ -24,6 +24,7 @@ import { helmetConfig, corsConfig } from './config/security.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import apiRouter from './routes/documentRoutes.js';
 import authRouter from './routes/authRoutes.js';
+import adminRouter from './routes/adminRoutes.js';
 
 // ── ES Module __dirname equivalent ──
 const __filename = fileURLToPath(import.meta.url);
@@ -34,6 +35,16 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 
 async function startServer() {
   const app = express();
+
+  // ── 0. Pre-flight Environment Checks ──
+  if (!process.env.JWT_SECRET) {
+    console.error('[FATAL] JWT_SECRET environment variable is missing.');
+    process.exit(1);
+  }
+  if (!process.env.MONGODB_URI) {
+    console.error('[FATAL] MONGODB_URI environment variable is missing.');
+    process.exit(1);
+  }
 
   // ── 1. Connect to MongoDB ──
   await connectDB();
@@ -80,6 +91,7 @@ async function startServer() {
 
   // ── 8. API Routes ──
   app.use('/api/auth', authRouter);
+  app.use('/api/admin', adminRouter);
   app.use('/api', apiRouter);
 
   // ── 9. Serve React Frontend (Production) ──

@@ -3,6 +3,7 @@ import { UploadCloud, Loader2, AlertCircle, ShieldCheck, Lock } from 'lucide-rea
 import { uploadFile, getCurrentUser } from '../lib/api.js';
 import HashResult from './HashResult.jsx';
 import AuthModal from './AuthModal.jsx';
+import SEO from './SEO.jsx';
 
 export default function DropZone() {
   const [state, setState] = useState('idle'); // idle | dragging | uploading | hashing | anchoring | success | error
@@ -83,7 +84,12 @@ export default function DropZone() {
   const isWorking = ['uploading', 'hashing', 'anchoring'].includes(state);
 
   return (
-    <div className="max-w-2xl mx-auto animate-fade-in">
+    <>
+      <SEO 
+        title="Anchor Document" 
+        description="Cryptographically hash and anchor your documents on the ledger. Zero-knowledge architecture ensures your files never leave your device." 
+      />
+      <div className="max-w-2xl mx-auto animate-fade-in">
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold text-white mb-2">Cryptographic Document Registry</h2>
         <p className="text-zinc-400 text-sm">
@@ -199,5 +205,6 @@ export default function DropZone() {
         }}
       />
     </div>
+    </>
   );
 }

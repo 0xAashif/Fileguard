@@ -56,9 +56,7 @@ export async function connectDB() {
     });
   } catch (error) {
     console.error(`[DB] Failed to connect to MongoDB: ${error.message}`);
-    console.warn('[DB] Falling back to in-memory mode.');
-    dbState.isConnected = true;
-    dbState.provider = 'in-memory-fallback';
+    // We intentionally leave isConnected: false so health checks fail honestly
   }
 }
 

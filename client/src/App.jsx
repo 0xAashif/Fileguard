@@ -6,6 +6,7 @@ import DropZone from './components/DropZone.jsx';
 import VerifySection from './components/VerifySection.jsx';
 import DocumentList from './components/DocumentList.jsx';
 import Footer from './components/Footer.jsx';
+import Legal from './components/Legal.jsx';
 
 export default function App() {
   return (
@@ -19,6 +20,8 @@ export default function App() {
           <Route path="/upload" element={<DropZone />} />
           <Route path="/verify" element={<VerifySection />} />
           <Route path="/documents" element={<DocumentList />} />
+          <Route path="/privacy" element={<Legal />} />
+          <Route path="/terms" element={<Legal />} />
         </Routes>
       </main>
 

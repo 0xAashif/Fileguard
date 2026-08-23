@@ -28,6 +28,25 @@ export const uploadLimiter = rateLimit({
 });
 
 /**
+ * Per-user limiter for the anchor endpoint to prevent IP rotation abuse.
+ * 20 anchors per 15 minutes per User ID.
+ */
+export const userAnchorLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => {
+    // If user is authenticated, limit by user ID. Otherwise fallback to IP.
+    return req.user ? req.user._id.toString() : req.ip;
+  },
+  message: {
+    error: 'Anchor rate limit exceeded',
+    message: 'You have anchored too many documents recently. Please try again in 15 minutes.',
+  },
+});
+
+/**
  * General API limiter for read operations.
  * 100 requests per 15 minutes per IP address.
  */

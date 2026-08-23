@@ -3,6 +3,7 @@ import { FileText, Search, ChevronLeft, ChevronRight, Inbox, Lock, ExternalLink,
 import { getDocuments, getCurrentUser } from '../lib/api.js';
 import { Link } from 'react-router-dom';
 import AuthModal from './AuthModal.jsx';
+import SEO from './SEO.jsx';
 
 function formatBytes(bytes) {
   if (!bytes) return '—';
@@ -116,7 +117,12 @@ export default function DocumentList() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto animate-fade-in">
+    <>
+      <SEO 
+        title="My Documents" 
+        description="View and manage the cryptographic records anchored by your organization." 
+      />
+      <div className="max-w-4xl mx-auto animate-fade-in">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div>
           <h2 className="text-2xl font-bold text-white">Anchored Records</h2>
@@ -218,5 +224,6 @@ export default function DocumentList() {
         )}
       </div>
     </div>
+    </>
   );
 }

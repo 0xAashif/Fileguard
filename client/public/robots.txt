@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Allow: /verify
+
+Sitemap: https://fileguard.onrender.com/sitemap.xml

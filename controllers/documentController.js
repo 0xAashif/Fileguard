@@ -1,3 +1,5 @@
+import mongoose from 'mongoose';
+import { dbState } from '../config/db.js';
 import Document from '../models/Document.js';
 import { submitHash } from '../services/originStamp.js';
 
@@ -9,7 +11,14 @@ export const anchorDocument = async (req, res, next) => {
       return res.status(400).json({ error: 'hash and fileName are required' });
     }
 
-    const existing = await Document.findOne({ originalHash: hash.toLowerCase() });
+    if (!req.user.isVerified) {
+      return res.status(403).json({ error: 'Issuer identity not verified. Please verify your email or await admin approval.' });
+    }
+
+    const existing = await Document.findOne({ 
+      originalHash: hash.toLowerCase(),
+      userId: req.user._id
+    });
     if (existing) {
       return res.status(200).json({
         message: 'Document already anchored in registry',
@@ -28,7 +37,7 @@ export const anchorDocument = async (req, res, next) => {
       originalHash: hash.toLowerCase(),
       fileSizeBytes: fileSizeBytes || 0,
       status: anchorResult.mode === 'mock' ? 'mock' : 'anchored',
-      originStampTxId: anchorResult.transaction_id,
+      originStampTxId: anchorResult.transactionId,
       originStampTimestamp: anchorResult.timestamp || new Date(),
     });
 
@@ -46,7 +55,7 @@ export const verifyDocument = async (req, res, next) => {
     const { hash } = req.body;
     if (!hash) return res.status(400).json({ error: 'Hash is required' });
 
-    const doc = await Document.findOne({ originalHash: hash.toLowerCase() });
+    const doc = await Document.findOne({ originalHash: hash.toLowerCase() }).populate('userId', 'isVerified');
 
     if (!doc) {
       return res.status(404).json({
@@ -71,6 +80,7 @@ export const verifyDocument = async (req, res, next) => {
         originalHash: doc.originalHash,
         fileSizeBytes: doc.fileSizeBytes,
         issuerName: doc.issuerName,
+        issuerVerified: doc.userId?.isVerified || false,
         status: doc.status,
         originStampTxId: doc.originStampTxId,
         originStampTimestamp: doc.originStampTimestamp,
@@ -86,13 +96,23 @@ export const verifyDocument = async (req, res, next) => {
 
 export const getDocuments = async (req, res, next) => {
   try {
-    // Only return documents created by the authenticated issuer
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 10;
+    const skip = (page - 1) * limit;
+
+    const total = await Document.countDocuments({ userId: req.user._id });
     const docs = await Document.find({ userId: req.user._id })
       .sort({ createdAt: -1 })
-      .limit(50);
+      .skip(skip)
+      .limit(limit);
+
     res.json({
       documents: docs,
-      pagination: { total: docs.length, page: 1, pages: 1 },
+      pagination: { 
+        total, 
+        page, 
+        pages: Math.ceil(total / limit) 
+      },
     });
   } catch (err) {
     next(err);
@@ -101,14 +121,39 @@ export const getDocuments = async (req, res, next) => {
 
 export const getDocument = async (req, res, next) => {
   try {
-    const doc = await Document.findById(req.params.id);
+    const doc = await Document.findById(req.params.id).populate('userId', 'isVerified');
     if (!doc) return res.status(404).json({ error: 'Document not found' });
-    res.json({ document: doc });
+    
+    // Return safe shape
+    res.json({ 
+      document: {
+        id: doc._id,
+        fileName: doc.fileName,
+        originalHash: doc.originalHash,
+        fileSizeBytes: doc.fileSizeBytes,
+        issuerName: doc.issuerName,
+        issuerVerified: doc.userId?.isVerified || false,
+        status: doc.status,
+        originStampTxId: doc.originStampTxId,
+        originStampTimestamp: doc.originStampTimestamp,
+        createdAt: doc.createdAt,
+        verificationCount: doc.verificationCount,
+        lastVerifiedAt: doc.lastVerifiedAt,
+      }
+    });
   } catch (err) {
     next(err);
   }
 };
 
 export const getHealth = (req, res) => {
-  res.json({ status: 'operational', timestamp: new Date() });
+  res.json({
+    status: dbState.isConnected ? 'operational' : 'degraded',
+    database: {
+      connected: dbState.isConnected,
+      readyState: mongoose.connection.readyState
+    },
+    originStampMode: process.env.ORIGINSTAMP_API_KEY ? 'live' : 'mock',
+    timestamp: new Date()
+  });
 };

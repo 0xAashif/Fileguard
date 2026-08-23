@@ -1,9 +1,15 @@
 import { Link } from 'react-router-dom';
 import { Shield, Upload, Search, Building, CheckCircle2, Lock } from 'lucide-react';
+import SEO from './SEO';
 
 export default function Hero() {
   return (
-    <section className="relative min-h-[80vh] flex items-center justify-center px-4 py-16">
+    <>
+      <SEO 
+        title="Home" 
+        description="FileGuard provides an immutable audit trail for universities, legal firms, and enterprises using zero-knowledge client-side hashing and blockchain anchoring." 
+      />
+      <section className="relative min-h-[80vh] flex items-center justify-center px-4 py-16">
       <div className="relative z-10 max-w-4xl mx-auto text-center">
         {/* Badge */}
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold mb-8 animate-fade-in">
@@ -68,5 +74,6 @@ export default function Hero() {
         </div>
       </div>
     </section>
+    </>
   );
 }

@@ -20,6 +20,15 @@ const userSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
+  isVerified: {
+    type: Boolean,
+    default: false,
+  },
+  verifiedAt: {
+    type: Date,
+  },
+  emailVerificationToken: String,
+  emailVerificationExpires: Date,
 }, { timestamps: true });
 
 userSchema.pre('save', async function (next) {

@@ -1,5 +1,5 @@
 import express from 'express';
-import { uploadLimiter, apiLimiter } from '../middlewares/rateLimiter.js';
+import { uploadLimiter, apiLimiter, userAnchorLimiter } from '../middlewares/rateLimiter.js';
 import { protect } from '../middlewares/authMiddleware.js';
 import {
   anchorDocument,
@@ -19,7 +19,7 @@ router.post('/documents/verify', apiLimiter, verifyDocument);
 router.get('/documents/:id', apiLimiter, getDocument);
 
 // Protected routes (Issuers only)
-router.post('/documents/anchor', uploadLimiter, protect, anchorDocument);
+router.post('/documents/anchor', uploadLimiter, protect, userAnchorLimiter, anchorDocument);
 router.get('/documents', apiLimiter, protect, getDocuments);
 
 export default router;

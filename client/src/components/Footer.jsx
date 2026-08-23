@@ -1,4 +1,5 @@
 import { Github, Shield } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function Footer() {
   return (
@@ -8,6 +9,14 @@ export default function Footer() {
           <div className="flex items-center gap-2 text-zinc-500 text-sm">
             <Shield className="w-4 h-4 text-amber-500/50" />
             <span>Built by <span className="text-zinc-400">Aashif Khan</span></span>
+          </div>
+
+          <div className="flex flex-col md:flex-row items-center gap-4 text-xs text-zinc-500">
+            <Link to="/privacy" className="hover:text-amber-400 transition-colors">Privacy Policy</Link>
+            <Link to="/terms" className="hover:text-amber-400 transition-colors">Terms of Service</Link>
+            <p>
+              © {new Date().getFullYear()} FileGuard. All rights reserved.
+            </p>
           </div>
 
           <div className="flex items-center gap-6 text-xs text-zinc-600">

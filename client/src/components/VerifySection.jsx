@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { verifyByFile, verifyByHash } from '../lib/api.js';
 import { generateCertificatePDF } from '../lib/certificateGenerator.js';
+import SEO from './SEO.jsx';
 
 export default function VerifySection() {
   const [searchParams] = useSearchParams();
@@ -211,7 +212,12 @@ export default function VerifySection() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto animate-fade-in">
+    <>
+      <SEO 
+        title="Verify Document" 
+        description="Independently verify any document against the cryptographic registry without creating an account." 
+      />
+      <div className="max-w-2xl mx-auto animate-fade-in">
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold text-white mb-2">Public Document Verification</h2>
         <p className="text-zinc-400 text-sm">
@@ -322,5 +328,6 @@ export default function VerifySection() {
         </div>
       )}
     </div>
+    </>
   );
 }
